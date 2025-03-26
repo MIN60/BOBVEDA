@@ -4,7 +4,7 @@
 #include "struct.h"
 #include "main.h"
 
-void search()
+void Search()
 {
 	char str[40];
 
@@ -27,7 +27,7 @@ void search()
 	return  ;
 }
 
-void remove()
+void Remove()
 {
 	char str[40];
 
@@ -41,20 +41,16 @@ void remove()
 			if (!strcmp(str, profile[i].name))
 			{
 				profile[i].is_deleted = 1;
-				//strcpy(profile[i].name, "0");//삭제할 인덱스의 배열에 -1 넣기
 				break;
 			}
-			else if (i == cnt - 1)
-			{
-				printf("잘못된 입력\n");
-			}
+			else if (i == cnt - 1) printf("잘못된 입력\n");
 		}
 	}
 
 	return;
 }
 
-void randomize()
+void Randomize()
 {
 	printf("randomize~\n");
 }

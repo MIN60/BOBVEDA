@@ -13,7 +13,7 @@ int main()
 	if (ifp == NULL)
 	{
 		printf("there's no input.txt\n");
-		perror(ifp);
+		//perror(ifp);
 		return 1;
 	}
 
@@ -28,24 +28,24 @@ int main()
 
 	fclose(ifp); //여기까지 구조체 배열에 input.txt 내용 넣음
 
-	search();
-	remove();
+	Search();
+	Remove();
 
-	randomize();
+	Randomize();
 
 	FILE* ofp;
 	ofp = fopen("output.txt", "w");
 	if (ofp == NULL)
 	{
 		printf("there's no output.txt\n");
-		perror(ofp);
+		//perror(ofp);
 		return 1;
 	}
 
 	//구조체 배열 ofp에 쓰기(-1로 적힌 건 제외)
 	for (int i = 0; i < cnt; i++)
 	{
-		if (!strcmp(profile[i].name, "0"))//만약 name에 0이 들어있는 행이라면
+		if(profile[i].is_deleted==1)//if (!strcmp(profile[i].name, "0"))//만약 name에 0이 들어있는 행이라면
 		{
 			continue;
 		}

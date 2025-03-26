@@ -1,7 +1,7 @@
 #pragma once
 
-void search();
+void Search();
 
-void remove();
+void Remove();
 
-void randomize();
+void Randomize();
