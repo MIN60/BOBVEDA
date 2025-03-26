@@ -23,7 +23,7 @@ void TeamSelect(TEAM* Team, MEMBER* Male, MEMBER* Female, int Mcount, int Fcount
 		SelectedIdx = FemaleIdx[RandomNumber(RemainingF)];
 		int teamIdx = idx % (LastIndex + 1);
 
-		if (!DuplCheck(Female[SelectedIdx].prev_team, Team[idx].set)) {//중복 팀 확인
+		if (DuplCheck(Female[SelectedIdx].prev_team, Team[idx].set)) {//중복 팀 확인
 			continue; //재추첨
 		}
 
@@ -41,12 +41,12 @@ void TeamSelect(TEAM* Team, MEMBER* Male, MEMBER* Female, int Mcount, int Fcount
 
 	for (int i = 0; i < Mcount; ) {
 		SelectedIdx = MaleIdx[RandomNumber(RemainingM)];
-
-		if (Male[SelectedIdx].prev_team == idx % (LastIndex + 1)) {
+		teamIdx = idx % (LastIndex + 1);
+		
+		if (DuplCheck(Female[SelectedIdx].prev_team, Team[idx].set)) {
 			continue;
 		}
 
-		teamIdx = idx % (LastIndex + 1);
 		Team[teamIdx].member[(Team[teamIdx].count)] = Male[SelectedIdx];//멤버 삽입, 멤버 수 증가
 		Team[teamIdx].set[Team[teamIdx].count] = Male[SelectedIdx].prev_team; //현재 조 set을 업데이트
 		Team[teamIdx].count++;
