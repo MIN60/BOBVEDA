@@ -1,0 +1,17 @@
+﻿  Classification.c
+  DuplCheck.c
+  main.c
+  Random.c
+C:\BOBVEDA\bob\main.c(13,2): warning C4013: 'ReadOrigin'이(가) 정의되지 않았습니다. extern은 int형을 반환하는 것으로 간주합니다.
+C:\BOBVEDA\bob\Random.c(8,11): warning C4244: '함수': 'time_t'에서 'unsigned int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+  TeamSelect.c
+C:\BOBVEDA\bob\TeamSelect.c(8,19): warning C4013: 'CreateNumArr'이(가) 정의되지 않았습니다. extern은 int형을 반환하는 것으로 간주합니다.
+C:\BOBVEDA\bob\TeamSelect.c(23,27): warning C4013: 'RandomNumber'이(가) 정의되지 않았습니다. extern은 int형을 반환하는 것으로 간주합니다.
+C:\BOBVEDA\bob\TeamSelect.c(25,8): warning C4013: 'DuplCheck'이(가) 정의되지 않았습니다. extern은 int형을 반환하는 것으로 간주합니다.
+C:\BOBVEDA\bob\TeamSelect.c(33,3): warning C4013: 'ArrUpdate'이(가) 정의되지 않았습니다. extern은 int형을 반환하는 것으로 간주합니다.
+C:\BOBVEDA\bob\TeamSelect.c(57,2): warning C4013: 'free'이(가) 정의되지 않았습니다. extern은 int형을 반환하는 것으로 간주합니다.
+C:\BOBVEDA\bob\TeamSelect.c(8,7): warning C4047: '초기화 중': 'int *'의 간접 참조 수준이 'int'과(와) 다릅니다.
+C:\BOBVEDA\bob\TeamSelect.c(9,7): warning C4047: '초기화 중': 'int *'의 간접 참조 수준이 'int'과(와) 다릅니다.
+  코드를 생성하고 있습니다...
+main.obj : error LNK2019: ReadOriginmain 함수에서 참조되는 확인할 수 없는 외부 기호
+C:\BOBVEDA\bob\x64\Debug\bob.exe : fatal error LNK1120: 1개의 확인할 수 없는 외부 참조입니다.

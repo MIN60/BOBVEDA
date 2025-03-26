@@ -3,38 +3,57 @@
 #include <time.h>
 #include "struct.h"
 
-//각팀에 이전조와 중복없이 넣는 함수
-void TeamSelect(TEAM * Team, MEMBER * Male, MEMBER* Female)
-{
-	int Mcount = (sizeof(Male) / sizeof(Male[0])); //남자 수
-	int Fcount = (sizeof(Female) / sizeof(Female[0]));//여자 수
-	int NotSelect = Mcount + Fcount;//선택되지 않은 사람의 수
-	int* FemaleIdx = CreateNumArr(Fcount);//남자에게 배분
-	int* MaleIdx = CreateNumArr(Fcount);
+//각 팀에 이전팀과 성비를 감안하여 조를 짜는 함수
+void TeamSelect(TEAM* Team, MEMBER* Male, MEMBER* Female, int Mcount, int Fcount) {
+	int* FemaleIdx = CreateNumArr(Fcount);
+	int* MaleIdx = CreateNumArr(Mcount);
 
-	int LastIndex = (30/4)-1;//마지막 조의 인덱스
+	int LastIndex = 6;//끝 조 인덱스
 	int idx = 0;//현재 조
 
-	int SelectedIdx; //선택된 번호(자리)
+	int RemainingF = Fcount;//남은 여성 인원 수
+	int RemainingM = Mcount;//남은 남성 인원 수
 
-	for (int i = 0; i < Fcount; Fcount--) //선택되지 않은 여자가 없을 때까지 반복
-	{
+	int SelectedIdx;//선택된 번호(자리)
 
-		SelectedIdx = FemaleIdx[RandomNumber(Fcount)]; //무작위로 선택된 idx(n번째 쪽지)
-		if (Female[SelectedIdx].prev_team == SelectedIdx%(LastIndex+1)) //중복 됐다면
-		{
-			Fcount++; //재추첨
+	for (int i = 0; i < 7; i++)//인원 0으로 초기화
+		Team[idx++].count = 0;
+
+	for (int i = 0; i < Fcount; ) { //남은 사람 기준으로 반복
+		SelectedIdx = FemaleIdx[RandomNumber(RemainingF)];
+
+		if (!DuplCheck(Female[SelectedIdx].prev_team, Team[idx].set)) {//중복 팀 확인
+			continue; //재추첨
+		}
+
+		int teamIdx = idx % (LastIndex + 1);
+		Team[teamIdx].member[(Team[teamIdx].count)++] = Female[SelectedIdx];//멤버 삽입, 멤버 수 증가
+		Team[teamIdx].set[Team[teamIdx].count] = Female[SelectedIdx].prev_team; //현재 조 set을 업데이트
+
+		ArrUpdate(FemaleIdx, RemainingF, SelectedIdx); //배열 축소
+		RemainingF--; //남은 여성 인원 감소
+		i++;
+		idx++;
+		
+	}
+
+	for (int i = 0; i < Mcount; ) {
+		SelectedIdx = MaleIdx[RandomNumber(RemainingM)];
+
+		if (Male[SelectedIdx].prev_team == idx % (LastIndex + 1)) {
 			continue;
 		}
-		else
-			ArrUpdate(FemaleIdx, Fcount, SelectedIdx); //해당 Idx 제거 후 배열 축소
+
+		int teamIdx = idx % (LastIndex + 1);
+		Team[teamIdx].member[(Team[teamIdx].count)++] = Male[SelectedIdx];//멤버 삽입, 멤버 수 증가
+		Team[teamIdx].set[Team[teamIdx].count] = Female[SelectedIdx].prev_team; //현재 조 set을 업데이트
+
+		ArrUpdate(MaleIdx, RemainingM, SelectedIdx); //배열 축소
+		RemainingM--; //남은 남성 인원 감소
+		i++;
+		idx++;
 	}
 
-	for (int i = 0; i < Mcount; Mcount--) //선택되지 않은 남자가 없을 때까지 반복
-	{
-
-	}
-
-	free(); //Fidx
-	free(); //Midx
+	free(FemaleIdx);
+	free(MaleIdx);
 }

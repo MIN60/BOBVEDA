@@ -1,17 +1,20 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+
 //0 ~ num-1 사이의 난수 출력
+void InitRandom()
+{
+    srand(time(NULL)); // 프로그램 시작 시 한 번만 실행
+}
+
 int RandomNumber(int num)
 {
-	srand(time(NULL)); // 난수 초기화
-	int random = rand() % num;
-	
-	return random;
+    if (num <= 0) return -1; // 안전 장치
+    return rand() % num;
 }
-// FemaleIdx[RandomNumber(Fcount)]
-// 배열 생성
 
+//숫자 구성 배열 생성
 int* CreateNumArr(int num)
 {
 	int* new_arr = malloc(sizeof(int) * num);
