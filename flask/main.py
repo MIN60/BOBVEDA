@@ -51,6 +51,12 @@ def handle_bobveda():
         'div_group': div_group,
         'remove_p': remove_p,
         'waiting_for_file': True
+    }
+
+    return jsonify({
+        "response_type": "in_channel",
+        "text": f"밥의 한계를 베다! {user_name}님이 요청한 `{div_group}명 랜밥` 시작!\n 제외 인원: {', '.join(remove_p) if remove_p else '없음'}\n 이제 멤버 목록 파일을 업로드해주세요."
+    })
 
 
 if __name__ == "__main__":
