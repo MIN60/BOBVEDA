@@ -48,7 +48,7 @@ def parse_command(text):
 # 파일 업로드 리마인드 (30초 뒤에도 안 올리면 알림림)
 def remind_file(user_id):
     time.sleep(30)
-    if user_id in user_commands and user_commands[user_id].get("파일 업로드 대기중", False):
+    if user_id in user_commands and user_commands[user_id].get("waiting_for_file", False):
         try:
             client.chat_postMessage(
                 channel=user_commands[user_id]['channel_id'],
