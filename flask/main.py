@@ -1,8 +1,13 @@
 from flask import Flask, request, jsonify
 import json
 import time
+import threading
+from slack_sdk import WebClient
 
 app = Flask(__name__)
+
+# 사용자별 명령 정보
+user_commands = {}
 
 @app.route("/", methods=["GET"])
 def index():
@@ -27,6 +32,25 @@ def parse_command(text):
 
     #그룹수, 제거자 파싱
     return div_group, remove_p
+
+# 커맨드 처리
+@app.route("/slack/bobveda", methods=["POST"])
+def handle_bobveda():
+    user_id = request.form.get("user_id")
+    user_name = request.form.get("user_name")
+    text = request.form.get("text")
+    channel_id = request.form.get("channel_id")
+
+    print(f"밥베다 호출! From {user_name} → 명령어 내용: {text}")
+
+    div_group, remove_p = parse_command(text)
+
+    user_commands[user_id] = {
+        'timestamp': time.time(),
+        'channel_id': channel_id,
+        'div_group': div_group,
+        'remove_p': remove_p,
+        'waiting_for_file': True
 
 
 if __name__ == "__main__":
