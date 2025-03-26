@@ -5,12 +5,14 @@
 
 unsigned int next = 1;
 
+
 typedef struct MEMBER
 {
     char name[5];
     char gender;
     unsigned int prev_team;
     unsigned char id;
+
 
 
 } MEMBER;
