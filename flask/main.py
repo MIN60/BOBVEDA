@@ -3,14 +3,23 @@ import json
 import time
 import threading
 import os
+import requests
 from slack_sdk import WebClient
 from slack_sdk.errors import SlackApiError
 from slack_sdk import WebClient
 
 app = Flask(__name__)
 client = WebClient(token=os.environ.get("MY_TOKEN"))
+SLACK_TOKEN = os.environ.get("MY_TOKEN")
+
 # 사용자별 명령 정보
 user_commands = {}
+# 파일 저장 폴더
+UPLOAD_FOLDER = './uploads'
+RESULT_FOLDER = './results'
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+os.makedirs(RESULT_FOLDER, exist_ok=True)
+
 
 @app.route("/", methods=["GET"])
 def index():
@@ -82,6 +91,65 @@ def handle_bobveda():
         "response_type": "in_channel",
         "text": f"밥의 한계를 베다! {user_name}님이 요청한 `{div_group}명 랜밥` 시작!\n 제외 인원: {', '.join(remove_p) if remove_p else '없음'}\n 이제 멤버 목록 파일을 업로드해주세요."
     })
+    
+@app.route("/slack/events", methods=["POST"])
+def slack_events():
+    data = request.get_json() #slack 데이터 파싱
+
+    # 슬랫 통신 응답
+    if "challenge" in data:
+        return jsonify({"challenge": data["challenge"]})
+
+    event = data.get("event", {})
+    event_type = event.get("type")
+
+    #파일 이벤트 처리
+    if event_type in ("file_shared", "file_created"):
+        user_id = event.get("user_id") or event.get("user")
+        file_id = event.get("file_id") or event.get("file", {}).get("id")
+
+        if user_id in user_commands and user_commands[user_id].get('waiting_for_file'):
+            process_file(user_id, file_id)
+
+    return '', 200
+
+# 파일 처리
+def process_file(user_id, file_id):
+    try:
+        file_info = client.files_info(file=file_id)
+        file_url = file_info['file']['url_private']
+        file_name = file_info['file']['name']
+        channel_id = user_commands[user_id]['channel_id']
+
+        headers = {"Authorization": f"Bearer {SLACK_TOKEN}"}
+        response = requests.get(file_url, headers=headers)
+
+        if response.status_code != 200:
+            client.chat_postMessage(channel=channel_id,
+                text=f"다운로드실패 (코드: {response.status_code})")
+            return
+
+        # 유저 ID랑 저장
+        file_path = os.path.join(UPLOAD_FOLDER, f"{user_id}_{file_name}")
+        with open(file_path, 'wb') as f:
+            f.write(response.content)
+
+        user_commands[user_id]['waiting_for_file'] = False
+        user_commands[user_id]['file_path'] = file_path
+
+        client.chat_postMessage(channel=channel_id,
+            text="조금만 기다려 주세요")
+
+        #C 프로그램 돌리기
+
+    except SlackApiError as e:
+        print(f"Slack API 오류: {e}")
+        client.chat_postMessage(channel=user_commands[user_id]['channel_id'],
+            text=f"오류 {str(e)}")
+    except Exception as e:
+        print(f"예외 발생: {e}")
+        client.chat_postMessage(channel=user_commands[user_id]['channel_id'],
+            text=f"오류 {str(e)}")
 
 
 if __name__ == "__main__":
