@@ -2,19 +2,19 @@
 #include <stdlib.h>
 #include <time.h>
 
-//0 ~ num-1 »çÀÌÀÇ ³­¼ö Ãâ·Â
+//0 ~ num-1 ì‚¬ì´ì˜ ë‚œìˆ˜ ì¶œë ¥
 void InitRandom()
 {
-    srand(time(NULL)); // ÇÁ·Î±×·¥ ½ÃÀÛ ½Ã ÇÑ ¹ø¸¸ ½ÇÇà
+    srand(time(NULL)); // í”„ë¡œê·¸ë¨ ì‹œì‘ ì‹œ í•œ ë²ˆë§Œ ì‹¤í–‰
 }
 
 int RandomNumber(int num)
 {
-    if (num <= 0) return -1; // ¾ÈÀü ÀåÄ¡
+    if (num <= 0) return -1; // ì•ˆì „ ì¥ì¹˜
     return rand() % num;
 }
 
-//¼ıÀÚ ±¸¼º ¹è¿­ »ı¼º
+//ìˆ«ì êµ¬ì„± ë°°ì—´ ìƒì„±
 int* CreateNumArr(int num)
 {
 	int* new_arr = malloc(sizeof(int) * num);
@@ -25,21 +25,23 @@ int* CreateNumArr(int num)
 	return new_arr;
 }
 
-// ÇØ´ç ÀÎµ¦½ºÀÇ °ªÀ» ¹è¿­ ¸¶Áö¸·À¸·Î ÀÌµ¿ÇÑ ÈÄ Å©±â Ãà¼Ò
 void ArrUpdate(int** arr, int size, int index) {
-    if (size <= 1 || index >= size) return; // ¹è¿­ Å©±â°¡ 1 ÀÌÇÏÀÌ°Å³ª Àß¸øµÈ ÀÎµ¦½º¶ó¸é ¸®ÅÏ
+    if (size <= 1 || index >= size) return;
 
-    // ¼±ÅÃµÈ ÀÎµ¦½º °ªÀ» ¸¶Áö¸· À§Ä¡·Î ÀÌµ¿
     int temp = (*arr)[index];
     (*arr)[index] = (*arr)[size - 1];
     (*arr)[size - 1] = temp;
 
-    // Å©±â¸¦ 1 ÁÙÀÌ±â À§ÇØ realloc
     size -= 1;
-    *arr = realloc(*arr, (size) * sizeof(int));
 
-    if (*arr == NULL && size > 0) {
-        perror("Memory reallocation failed");
-        exit(1);
+    if (size > 0) {
+        *arr = realloc(*arr, size * sizeof(int));
+        if (*arr == NULL) {
+            perror("Memory reallocation failed");
+            exit(1);
+        }
+    } else {//sizeê°€ 0ì¼ ë•Œ ì˜ˆì™¸ì²˜ë¦¬
+        free(*arr);
+        *arr = NULL;
     }
 }
