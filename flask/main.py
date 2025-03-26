@@ -129,13 +129,16 @@ def process_file(user_id, file_id):
         file_url = file_info['file']['url_private']
         file_name = file_info['file']['name']
         channel_id = user_commands[user_id]['channel_id']
+        
+        client.chat_postMessage(channel=channel_id,
+            text="밥배정을 시작합니다...")
 
         headers = {"Authorization": f"Bearer {SLACK_TOKEN}"}
         response = requests.get(file_url, headers=headers)
 
         if response.status_code != 200:
             client.chat_postMessage(channel=channel_id,
-                text=f"다운로드실패 (코드: {response.status_code})")
+                text=f"다운로드에 실패했습니다 (코드: {response.status_code})")
             return
 
         # 유저 ID랑 저장
@@ -143,6 +146,7 @@ def process_file(user_id, file_id):
         with open(file_path, 'wb') as f:
             f.write(response.content)
 
+        print(f"!!!파일 저장 완료: {file_path}")
         user_commands[user_id]['waiting_for_file'] = False
         user_commands[user_id]['file_path'] = file_path
 
