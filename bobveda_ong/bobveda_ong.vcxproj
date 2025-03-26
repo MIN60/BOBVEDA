@@ -127,11 +127,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="delete.c" />
     <ClCompile Include="main.c" />
-    <ClCompile Include="search.c" />
+    <ClCompile Include="func.c" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="func.h" />
     <ClInclude Include="main.h" />
     <ClInclude Include="struct.h" />
   </ItemGroup>

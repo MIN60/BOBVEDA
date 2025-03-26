@@ -2,6 +2,7 @@
 #include <string.h>
 #include "struct.h"
 #include "main.h"
+#include "func.h"
 
 struct PROFILE profile[MAX_NUM]; //전역변수로 구조체 배열 선언
 
@@ -17,22 +18,23 @@ int main()
 	}
 
 	int i = 0;
-	while ((fsprintf(ifp, "%s %c %d %d", profile[i].name, &profile[i].gender , &profile[i].ex_team, &profile[i].team)) == 4)
+	while ((fscanf(ifp, "%s %c %d %d", profile[i].name, &profile[i].gender , &profile[i].ex_team, &profile[i].team)) == 4)
 	{
+		profile[i].is_deleted = 0;//1이 삭제
 		i++;
 	}
 
-	cnt = i+1; //실제 사람 수 저장
+	cnt = i; //실제 사람 수 저장
 
 	fclose(ifp); //여기까지 구조체 배열에 input.txt 내용 넣음
 
 	search();
-	delete();
+	remove();
 
-	randomize1();
+	randomize();
 
 	FILE* ofp;
-	ifp = fopen("output.txt", "w");
+	ofp = fopen("output.txt", "w");
 	if (ofp == NULL)
 	{
 		printf("there's no output.txt\n");
@@ -43,25 +45,31 @@ int main()
 	//구조체 배열 ofp에 쓰기(-1로 적힌 건 제외)
 	for (int i = 0; i < cnt; i++)
 	{
-		if (fprintf(ofp, "%s %c %d %d", profile[i].name, &profile[i].gender, &profile[i].ex_team, &profile[i].team)< 0)
+		if (!strcmp(profile[i].name, "0"))//만약 name에 0이 들어있는 행이라면
 		{
-			printf("%d번째 fprintf 실패\n", i);
+			continue;
 		}
 		else
 		{
-			if ((strcmp(profile[i].name, "0") != 0)
+			if (fprintf(ofp, "%s %c %d %d", profile[i].name, profile[i].gender, profile[i].ex_team, profile[i].team)< 0)
 			{
-				
-			}
+				printf("%d번째 fprintf 실패\n", i);
+			}			
 		}
+		//if (fprintf(ofp, "%s %c %d %d", profile[i].name, &profile[i].gender, &profile[i].ex_team, &profile[i].team)< 0)
+		//{
+		//	printf("%d번째 fprintf 실패\n", i);
+		//}
+		//else
+		//{
+		//	if ((strcmp(profile[i].name, "0") != 0)
+		//	{
+		//		
+		//	}
+		//}
 	}
 
 	fclose(ofp);
 
 	return 0;
-}
-
-void randomize()
-{
-	printf("randomize~\n");
 }
