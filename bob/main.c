@@ -23,7 +23,7 @@ int main()
         teams[i].member = (MEMBER*)malloc(sizeof(MEMBER) * 5); // 최대 5명 할당
         teams[i].count = 0;
         for (int j = 0; j < 5; j++) {
-            teams[i].set[j] = -1;
+            teams[i].set[j] = -1;//팀 초기화 시 set 배열도 초기화
         }
     }
 
