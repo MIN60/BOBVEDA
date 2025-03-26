@@ -3,6 +3,7 @@
 #include <time.h>
 #include "my_rand.h"
 
+
 typedef struct Person
 {
     wchar_t name[20];
@@ -11,6 +12,7 @@ typedef struct Person
     unsigned int prev_team;
 
 } Person;
+
 
 
 int main()
