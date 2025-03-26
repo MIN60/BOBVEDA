@@ -7,10 +7,18 @@ import requests
 from slack_sdk import WebClient
 from slack_sdk.errors import SlackApiError
 from slack_sdk import WebClient
+from dotenv import load_dotenv
 
+load_dotenv()
 app = Flask(__name__)
-client = WebClient(token=os.environ.get("MY_TOKEN"))
-SLACK_TOKEN = os.environ.get("MY_TOKEN")
+
+#토큰 설정
+SLACK_TOKEN = os.environ.get("SLACK_TOKEN")
+if not SLACK_TOKEN:
+    print("토큰오류남")
+    exit(1)
+
+client = WebClient(token=SLACK_TOKEN)
 
 # 사용자별 명령 정보
 user_commands = {}
@@ -23,7 +31,7 @@ os.makedirs(RESULT_FOLDER, exist_ok=True)
 
 @app.route("/", methods=["GET"])
 def index():
-    return "bobveda 서버 실행 중"
+    return "bobveda 서버 실행"
 
 #슬랙 명령어 파싱
 def parse_command(text):
@@ -47,15 +55,16 @@ def parse_command(text):
 
 # 파일 업로드 리마인드 (30초 뒤에도 안 올리면 알림림)
 def remind_file(user_id):
-    time.sleep(30)
+    time.sleep(20)
     if user_id in user_commands and user_commands[user_id].get("waiting_for_file", False):
         try:
             client.chat_postMessage(
                 channel=user_commands[user_id]['channel_id'],
-                text="'이름 성별 조' 로 이루어진 txt파일을 업로드 하세요."
+                text="'이름 성별'로 이루어진 txt파일을 기다리고 있습니다...\n예시:\n김도현 M\n남윤서 F"
             )
+            print(f"!!!리마인드 메시지 전송 완료 {user_id}")
         except SlackApiError as e:
-            print(f"리마인드 실패함: {e}")
+            print(f"!!!리마인드 실패함: {e}")
 
 # 커맨드 처리
 @app.route("/slack/bobveda", methods=["POST"])
@@ -65,7 +74,7 @@ def handle_bobveda():
     text = request.form.get("text")
     channel_id = request.form.get("channel_id")
 
-    print(f"밥베다 호출! From {user_name} → 명령어 내용: {text}")
+    print(f"밥베다 호출\n 사용자: {user_name} 명령어 내용: {text}")
 
     div_group, remove_p = parse_command(text)
     
@@ -73,7 +82,7 @@ def handle_bobveda():
     if div_group is None:
         return jsonify({
             "response_type": "ephemeral",
-            "text": "올바른 형식으로 입력해주세요. 예: '/bobveda 4 -김민정, 옹미령'"
+            "text": "올바른 형식으로 입력해주세요. 예: '/bobveda 4 -김민정, 옹미령, 장동철'"
         })
 
     user_commands[user_id] = {
