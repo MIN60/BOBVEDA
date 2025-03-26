@@ -44,6 +44,13 @@ def handle_bobveda():
     print(f"밥베다 호출! From {user_name} → 명령어 내용: {text}")
 
     div_group, remove_p = parse_command(text)
+    
+    # 예외처리
+    if div_group is None:
+        return jsonify({
+            "response_type": "ephemeral",
+            "text": "올바른 형식으로 입력해주세요. 예: '/bobveda 4 -김민정, 옹미령'"
+        })
 
     user_commands[user_id] = {
         'timestamp': time.time(),
