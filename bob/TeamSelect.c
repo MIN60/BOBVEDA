@@ -41,7 +41,7 @@ void TeamSelect(TEAM* Team, MEMBER* Male, MEMBER* Female, int Mcount, int Fcount
 
 	for (int i = 0; i < Mcount; ) {
 		SelectedIdx = MaleIdx[RandomNumber(RemainingM)];
-		teamIdx = idx % (LastIndex + 1);
+		int teamIdx = idx % (LastIndex + 1);
 		
 		if (DuplCheck(Female[SelectedIdx].prev_team, Team[idx].set)) {
 			continue;
