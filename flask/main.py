@@ -2,10 +2,13 @@ from flask import Flask, request, jsonify
 import json
 import time
 import threading
+import os
+from slack_sdk import WebClient
+from slack_sdk.errors import SlackApiError
 from slack_sdk import WebClient
 
 app = Flask(__name__)
-
+client = WebClient(token=os.environ.get("MY_TOKEN"))
 # 사용자별 명령 정보
 user_commands = {}
 
@@ -33,6 +36,18 @@ def parse_command(text):
     #그룹수, 제거자 파싱
     return div_group, remove_p
 
+# 파일 업로드 리마인드 (30초 뒤에도 안 올리면 알림림)
+def remind_file(user_id):
+    time.sleep(30)
+    if user_id in user_commands and user_commands[user_id].get("파일 업로드 대기중", False):
+        try:
+            client.chat_postMessage(
+                channel=user_commands[user_id]['channel_id'],
+                text="'이름 성별 조' 로 이루어진 txt파일을 업로드 하세요."
+            )
+        except SlackApiError as e:
+            print(f"리마인드 실패함: {e}")
+
 # 커맨드 처리
 @app.route("/slack/bobveda", methods=["POST"])
 def handle_bobveda():
@@ -59,6 +74,9 @@ def handle_bobveda():
         'remove_p': remove_p,
         'waiting_for_file': True
     }
+
+    # 리마인드 스레드 실행
+    threading.Thread(target=remind_file, args=(user_id,), daemon=True).start()
 
     return jsonify({
         "response_type": "in_channel",
