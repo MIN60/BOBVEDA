@@ -1,4 +1,0 @@
-kanye M 3 0 0
-kim F 2 0 0
-north F 4 0 0
-sicago F 1 0 0
