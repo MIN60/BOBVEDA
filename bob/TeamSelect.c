@@ -3,37 +3,39 @@
 #include <time.h>
 #include "struct.h"
 
-//°¢ ÆÀ¿¡ ÀÌÀüÆÀ°ú ¼ººñ¸¦ °¨¾ÈÇÏ¿© Á¶¸¦ Â¥´Â ÇÔ¼ö
+//ê° íŒ€ì— ì´ì „íŒ€ê³¼ ì„±ë¹„ë¥¼ ê°ì•ˆí•˜ì—¬ ì¡°ë¥¼ ì§œëŠ” í•¨ìˆ˜
 void TeamSelect(TEAM* Team, MEMBER* Male, MEMBER* Female, int Mcount, int Fcount) {
 	int* FemaleIdx = CreateNumArr(Fcount);
 	int* MaleIdx = CreateNumArr(Mcount);
 
-	int LastIndex = 6;//³¡ Á¶ ÀÎµ¦½º
-	int idx = 0;//ÇöÀç Á¶
+	int LastIndex = 6;//ë ì¡° ì¸ë±ìŠ¤
+	int idx = 0;//í˜„ì¬ ì¡°
 
-	int RemainingF = Fcount;//³²Àº ¿©¼º ÀÎ¿ø ¼ö
-	int RemainingM = Mcount;//³²Àº ³²¼º ÀÎ¿ø ¼ö
+	int RemainingF = Fcount;//ë‚¨ì€ ì—¬ì„± ì¸ì› ìˆ˜
+	int RemainingM = Mcount;//ë‚¨ì€ ë‚¨ì„± ì¸ì› ìˆ˜
 
-	int SelectedIdx;//¼±ÅÃµÈ ¹øÈ£(ÀÚ¸®)
+	int SelectedIdx;//ì„ íƒëœ ë²ˆí˜¸(ìë¦¬)
 
-	for (int i = 0; i < 7; i++)//ÀÎ¿ø 0À¸·Î ÃÊ±âÈ­
+	for (int i = 0; i < 7; i++)//ì¸ì› 0ìœ¼ë¡œ ì´ˆê¸°í™”
 		Team[idx++].count = 0;
 
-	for (int i = 0; i < Fcount; ) { //³²Àº »ç¶÷ ±âÁØÀ¸·Î ¹İº¹
+	for (int i = 0; i < Fcount; ) { //ë‚¨ì€ ì‚¬ëŒ ê¸°ì¤€ìœ¼ë¡œ ë°˜ë³µ
 		SelectedIdx = FemaleIdx[RandomNumber(RemainingF)];
+		int teamIdx = idx % (LastIndex + 1);
 
-		if (!DuplCheck(Female[SelectedIdx].prev_team, Team[idx].set)) {//Áßº¹ ÆÀ È®ÀÎ
-			continue; //ÀçÃßÃ·
+		if (!DuplCheck(Female[SelectedIdx].prev_team, Team[idx].set)) {//ì¤‘ë³µ íŒ€ í™•ì¸
+			continue; //ì¬ì¶”ì²¨
 		}
 
-		int teamIdx = idx % (LastIndex + 1);
-		Team[teamIdx].member[(Team[teamIdx].count)++] = Female[SelectedIdx];//¸â¹ö »ğÀÔ, ¸â¹ö ¼ö Áõ°¡
-		Team[teamIdx].set[Team[teamIdx].count] = Female[SelectedIdx].prev_team; //ÇöÀç Á¶ setÀ» ¾÷µ¥ÀÌÆ®
+		
+		Team[teamIdx].member[(Team[teamIdx].count)] = Female[SelectedIdx];//ë©¤ë²„ ì‚½ì…, ë©¤ë²„ ìˆ˜ ì¦ê°€
+		Team[teamIdx].set[Team[teamIdx].count] = Female[SelectedIdx].prev_team; //í˜„ì¬ ì¡° setì„ ì—…ë°ì´íŠ¸
+		Team[teamIdx].count++;
 
-		ArrUpdate(FemaleIdx, RemainingF, SelectedIdx); //¹è¿­ Ãà¼Ò
-		RemainingF--; //³²Àº ¿©¼º ÀÎ¿ø °¨¼Ò
+		ArrUpdate(FemaleIdx, RemainingF, SelectedIdx); //ë°°ì—´ ì¶•ì†Œ
+		RemainingF--; //ë‚¨ì€ ì—¬ì„± ì¸ì› ê°ì†Œ
 		i++;
-		idx++;
+		idx++; //ë‹¤ìŒì¡°ë¡œ ì´ë™
 		
 	}
 
@@ -44,12 +46,13 @@ void TeamSelect(TEAM* Team, MEMBER* Male, MEMBER* Female, int Mcount, int Fcount
 			continue;
 		}
 
-		int teamIdx = idx % (LastIndex + 1);
-		Team[teamIdx].member[(Team[teamIdx].count)++] = Male[SelectedIdx];//¸â¹ö »ğÀÔ, ¸â¹ö ¼ö Áõ°¡
-		Team[teamIdx].set[Team[teamIdx].count] = Female[SelectedIdx].prev_team; //ÇöÀç Á¶ setÀ» ¾÷µ¥ÀÌÆ®
+		teamIdx = idx % (LastIndex + 1);
+		Team[teamIdx].member[(Team[teamIdx].count)] = Male[SelectedIdx];//ë©¤ë²„ ì‚½ì…, ë©¤ë²„ ìˆ˜ ì¦ê°€
+		Team[teamIdx].set[Team[teamIdx].count] = Male[SelectedIdx].prev_team; //í˜„ì¬ ì¡° setì„ ì—…ë°ì´íŠ¸
+		Team[teamIdx].count++;
 
-		ArrUpdate(MaleIdx, RemainingM, SelectedIdx); //¹è¿­ Ãà¼Ò
-		RemainingM--; //³²Àº ³²¼º ÀÎ¿ø °¨¼Ò
+		ArrUpdate(MaleIdx, RemainingM, SelectedIdx); //ë°°ì—´ ì¶•ì†Œ
+		RemainingM--; //ë‚¨ì€ ë‚¨ì„± ì¸ì› ê°ì†Œ
 		i++;
 		idx++;
 	}
