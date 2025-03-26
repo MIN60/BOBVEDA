@@ -1,4 +1,0 @@
-﻿  main.c
-main.obj : error LNK2001: 확인할 수 없는 외부 기호 cnt
-func.obj : error LNK2001: 확인할 수 없는 외부 기호 cnt
-C:\Users\1-02\Desktop\bob_ong\bobveda_ong\x64\Debug\bobveda_ong.exe : fatal error LNK1120: 1개의 확인할 수 없는 외부 참조입니다.

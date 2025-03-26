@@ -10,8 +10,11 @@ void Search()
 
 	while (1)
 	{
-		printf("찾을 멤버 이름 입력: "); fgets(str, sizeof(str), stdin);//gets(str);
-		if (strcmp(str,"0")==0) return;//안할거면 0
+		printf("찾을 멤버 이름 입력: ");
+		fgets(str, sizeof(str), stdin);
+		str[strcspn(str, "\n")] = '\0';
+		if (strcmp(str,"0")==0) return;
+
 
 		for (int i = 0; i < cnt; i++)
 		{
@@ -33,8 +36,10 @@ void Remove()
 
 	while (1)
 	{
-		printf("삭제할 사람 입력: "); fgets(str, sizeof(str), stdin);//gets(str);
-		if (strcmp(str, "0") == 0) return;//안할거면 0
+		printf("삭제할 사람 입력: "); 
+		fgets(str, sizeof(str), stdin);
+		str[strcspn(str, "\n")] = '\0';
+		if (strcmp(str, "0") == 0) return;
 
 		for (int i = 0; i < cnt; i++)
 		{
