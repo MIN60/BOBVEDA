@@ -11,12 +11,12 @@ void Classification(MEMBER* Tptr, MEMBER* Mptr, MEMBER* Fptr, const int size, in
 
 	for (int i = 0; i < size; i++)
 	{
-		if (Tptr[i].gender == 'f')
+		if (Tptr[i].gender == 'F')
 		{
 			Fptr[*FCount] = Tptr[i];
 			++(*FCount);
 		}
-		else if (Tptr[i].gender == 'm')
+		else if (Tptr[i].gender == 'M')
 		{
 			Mptr[*MCount] = Tptr[i];
 			++(*MCount);
