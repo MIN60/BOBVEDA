@@ -9,9 +9,35 @@
 
 int main()
 {
-	MEMBER member[30];
-	ReadOrigin(member, "origin.txt");
-	//WriteText(TEAM * Wptr, const char* file_name);
+    MEMBER member[30];//30명 기준
+    // ReadOrigin(member, "origin.txt");
 
-	return 0;
+    // 성별 분류
+    MEMBER Male[30], Female[30];
+    int Mcount, Fcount;
+    Classification(member, Male, Female, 30, &Fcount, &Mcount);
+
+    // 팀 생성
+    TEAM teams[7];
+    for (int i = 0; i < 7; i++) {
+        teams[i].member = (MEMBER*)malloc(sizeof(MEMBER) * 5); // 최대 5명 할당
+        teams[i].count = 0;
+        for (int j = 0; j < 5; j++) {
+            teams[i].set[j] = -1;//팀 초기화 시 set 배열도 초기화
+        }
+    }
+
+    // 팀 배정
+    InitRandom();
+    TeamSelect(teams, Male, Female, Mcount, Fcount);
+
+    // 결과 출력
+    // WriteText(teams, "output.txt");
+
+    // 메모리 해제
+    for (int i = 0; i < 7; i++) {
+        free(teams[i].member);
+    }
+
+    return 0;
 }
