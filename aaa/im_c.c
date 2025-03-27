@@ -49,7 +49,7 @@ int main(int argc, char* argv[]) {
     const char* output_file = argv[3];
 
     MEMBER member[30]; // 전체 멤버
-    MEMBER absent[30]; // 제외된 멤버
+    MEMBER absent[256]; // 제외된 멤버
     MEMBER Male[30], Female[30], Temp[30]; // 성별 분류
     int Mcount, Fcount, Tcount;
 
