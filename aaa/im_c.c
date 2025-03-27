@@ -3,6 +3,7 @@
 #include <string.h>
 #include <time.h>
 #include <stdlib.h>
+// gcc makegroup.c -o group_maker 이거로 실행파일 만들 수 있음
 
 typedef struct MEMBER MEMBER;
 typedef struct TEAM TEAM;
@@ -332,12 +333,12 @@ void Classification(MEMBER* Tptr, MEMBER* Mptr, MEMBER* Fptr, MEMBER* temp, cons
 
     for (int i = 0; i < size; i++)
     {
-        if (Tptr[i].gender == 'f')
+        if (Tptr[i].gender == 'F')
         {
             Fptr[*FCount] = Tptr[i];
             ++(*FCount);
         }
-        else if (Tptr[i].gender == 'm')
+        else if (Tptr[i].gender == 'M')
         {
             Mptr[*MCount] = Tptr[i];
             ++(*MCount);
