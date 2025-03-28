@@ -1,85 +1,119 @@
+#define _CRT_SECURE_NO_WARNINGS
 #include <stdio.h>
+#include <time.h>
 #include <string.h>
-#include "struct.h"
-#include "main.h"
-#include "func.h"
+#include "my_rand.h"
+#include "struct2.h"
 
-struct PROFILE profile[MAX_NUM]; //Àü¿ªº¯¼ö·Î ±¸Á¶Ã¼ ¹è¿­ ¼±¾ğ
-int cnt;
+#define NUM 28 //ìµœëŒ€ ëª…ìˆ˜
 
-int main()
+//typedef struct Person
+//{
+//    wchar_t name[20];
+//    char gender;
+//    unsigned char id;
+//    unsigned int prev_team;
+//
+//} Person;
+
+
+
+int main(/*char* absentee*/)
 {
-	FILE* ifp;
-	ifp = fopen("input.txt", "r");
-	if (ifp == NULL)
-	{
-		printf("there's no input.txt\n");
-		//perror(ifp);
-		return 1;
-	}
-
-	int i = 0;
-	while ((fscanf(ifp, "%s %c %d %d %d", profile[i].name, &profile[i].gender , &profile[i].ex_team, &profile[i].team, &profile[i].is_deleted)) == 5)
-	{
-		profile[i].is_deleted = 0;//1ÀÌ »èÁ¦
-		i++;
-	}
-
-	cnt = i; //½ÇÁ¦ »ç¶÷ ¼ö ÀúÀå
-
-	printf("-----------\n");
-	for (int j = 0; j < cnt; j++)
-	{
-		printf("%s %c %d\n", profile[j].name, profile[j].gender, profile[j].ex_team);
-	}
-	printf("-----------\n");
+    //ì´í•˜ 2ì¤„ì€ í˜¼ì ë””ë²„ê¹…í•  ë•Œ í…ŒìŠ¤íŠ¸ìš©
+    char ex_str[] = "kim,jang";  // ê²°ì„ì ëª©ë¡
+    char* absentee = ex_str;     // ë‹¨ì¼ ë¬¸ìì—´ í¬ì¸í„°
+     
+    Person people[NUM];  
 
 
-	fclose(ifp); //¿©±â±îÁö ±¸Á¶Ã¼ ¹è¿­¿¡ input.txt ³»¿ë ³ÖÀ½
+    FILE* fp = fopen("origin.txt", "r");
+    if (fp == NULL) {
+        perror("File opening failed");
+        return 1;  
+    }
+     
+    for (int i = 0; i < NUM; i++) {
+        fscanf(fp, "%s %c\n", people[i].name, &people[i].gender);
+    }
+     
+    fclose(fp);
 
-	Search();
-	Remove();
+    int absent_num = 0;  // ê²°ì„ì ìˆ˜
+    char tmp[128] = "";
+     
+    char* name = strtok(absentee, ",");
+    while (name != NULL) {
+        absent_num++;  // ê²°ì„ì ìˆ˜ ì¦ê°€
 
-	Randomize();
+        // ê²°ì„ì ì´ë¦„ì„ ì°¾ê³  ì„±ë³„ ìˆ˜ì •
+        for (int i = 0; i < NUM; i++) {
+            if (strcmp(name, people[i].name) == 0) {   
+                if (people[i].gender == 'M')
+                    people[i].gender = 'N';  // ê²°ì„í•  ë‚¨ì -> Nìœ¼ë¡œ ë³€ê²½
+                else if (people[i].gender == 'F')
+                    people[i].gender = 'E';  // ê²°ì„í•  ì—¬ì -> Eë¡œ ë³€ê²½
+            }
+        } 
+        name = strtok(NULL, ",");
+    }
 
-	FILE* ofp;
-	ofp = fopen("output.txt", "w");
-	if (ofp == NULL)
-	{
-		printf("there's no output.txt\n");
+    // í™•ì¸ìƒ: ê° êµ¬ì¡°ì²´ì˜ ëª¨ë“  ë©¤ë²„ë¥¼ í•œ ì¤„ë¡œ ì¶œë ¥(ê²°ì„ì ì„±ë³„ N, Eë¡œ ë³€ê²½)
+    for (int i = 0; i < NUM; i++) {
+        printf("%s %c\n", people[i].name, people[i].gender);
+    }
+    printf("----FOR TEST\n\n");
 
-		return 1;
-	}
+    // ID ì…”í”Œ
+    char input;
 
-	//±¸Á¶Ã¼ ¹è¿­ ofp¿¡ ¾²±â
-	for (int i = 0; i < cnt; i++)
-	{
-		if(profile[i].is_deleted==1)
-		{
-			continue;
-		}
-		else
-		{
-			fprintf(ofp, "%s %c %d %d %d\n", profile[i].name, profile[i].gender, profile[i].ex_team, profile[i].team, profile[i].is_deleted);
-			/*if (fprintf(ofp, "%s %c %d %d\n", profile[i].name, profile[i].gender, profile[i].ex_team, profile[i].team)< 0)
-			{
-				printf("%d¹øÂ° fprintf ½ÇÆĞ\n", i);
-			}	*/		
-		}
-		//if (fprintf(ofp, "%s %c %d %d", profile[i].name, &profile[i].gender, &profile[i].ex_team, &profile[i].team)< 0)
-		//{
-		//	printf("%d¹øÂ° fprintf ½ÇÆĞ\n", i);
-		//}
-		//else
-		//{
-		//	if ((strcmp(profile[i].name, "0") != 0)
-		//	{
-		//		
-		//	}
-		//}
-	}
+    while (1)
+    {
+        printf("continue (y)");
+        scanf("%c", &input);
 
-	fclose(ofp);
+        my_srand((unsigned int)time(0));
 
-	return 0;
+        int indices[28];
+        for (int i = 0; i < 28; i++)
+            indices[i] = i;
+
+        shuffle(indices, 28);
+
+        // íŒ€ êµ¬ì„±: 7íŒ€, ê° íŒ€ 4ëª…
+        Person team[7][4];
+
+        for (int i = 0; i < 28; i++)
+        {
+            int team_index = i / 4;
+            int member_index = i % 4;
+
+            team[team_index][member_index] = people[indices[i]];
+        }
+
+
+        // ê²°ê³¼ ì¶œë ¥
+        for (int i = 0; i < 7; i++)
+        {
+            int f_count = 0, m_count = 0;
+            printf("Team %d:\n", i + 1);
+            for (int j = 0; j < 4; j++)
+            {
+                printf("%s (%c)   ", team[i][j].name, team[i][j].gender);
+                //printf("  Name: %s, Gender: %c\n", team[i][j].name, team[i][j].gender);
+                //fprintf(fp, "%s\t%c\n", team[i][j].name, team[i][j].gender);
+                if (team[i][j].gender == 'F')
+                    f_count++;
+                else
+                    m_count++;
+            }
+            printf("\tmale: %d female: %d", m_count, f_count);
+            printf("\n\n");
+
+        }
+
+        printf("\n***************\n");
+    }
+
+    return 0;
 }
