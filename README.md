@@ -32,6 +32,4 @@
 * 잠시 후 결과가 채널에 표시됩니다.
 
 
-프로젝트 링크: https://github.com/yourusername/bobveda
-
 노션 : https://www.notion.so/1c094147560b8021ac04f9ed56198de0
