@@ -65,42 +65,81 @@ def handle_bobveda():
     # 기본 사용자 이름 설정
     user_name = "USER"
 
-    # user_id가 없으면 바로 에러 응답
     if not user_id:
         return jsonify({
             "response_type": "ephemeral",
             "text": "사용자 ID를 확인할 수 없습니다."
         })
 
-    # 닉네임 불러오기 시도
     try:
         user_info = client.users_info(user=user_id)
         user_name = (user_info['user']['profile'].get('display_name')
                      or user_info['user'].get('real_name') or "사용자")
+    except SlackApiError as e:
+        print(f"[SlackAPI 오류] 사용자 이름 조회 실패: {e.response['error']}")
+        user_name = "사용자"
     except Exception as e:
-        print(f"닉네임 가져오기 실패: {e}")
+        print(f"[기타 오류] 사용자 이름 조회 실패: {e}")
         user_name = "사용자"
 
     print(f"밥베다 호출됨 → 사용자: {user_name}, 내용: {text}")
 
-    remove_p = parse_command(text)
+    if not text:
+        return jsonify({
+            "response_type":
+            "ephemeral",
+            "text":
+            "명령어 내용이 비었습니다. `/bobveda 4 -제외할 사람` 또는 `/bobveda last -제외할 사람` 형식으로 입력하세요"
+        })
+
+    is_last = text.strip().lower().startswith("last")
+    exclude_text = text.strip()[4:] if is_last else text
+    remove_p = parse_command(exclude_text)
 
     user_commands[user_id] = {
         'timestamp': time.time(),
         'channel_id': channel_id,
         'remove_p': remove_p,
-        'waiting_for_file': True
+        'waiting_for_file': not is_last,
     }
 
-    # 파일 업로드 리마인드용 쓰레드 실행
-    threading.Thread(target=remind_file, args=(user_id, ), daemon=True).start()
+    if is_last:
+        # 기존 파일이 존재하는지 확인
+        last_uploaded_file = None
+        for fname in sorted(os.listdir(UPLOAD_FOLDER), reverse=True):
+            if fname.startswith(user_id):
+                last_uploaded_file = os.path.join(UPLOAD_FOLDER, fname)
+                break
 
-    return jsonify({
-        "response_type":
-        "in_channel",
-        "text":
-        f"밥의 한계를 베다! {user_name}님이 요청한 랜밥이 시작됩니다!\n제외 인원: {', '.join(remove_p) if remove_p else '없음'}\n멤버 목록 파일을 업로드해주세요."
-    })
+        if last_uploaded_file:
+            user_commands[user_id]['file_path'] = last_uploaded_file
+            threading.Thread(target=run_c_program,
+                             args=(user_id, ),
+                             daemon=True).start()
+            return jsonify({
+                "response_type":
+                "in_channel",
+                "text":
+                f"마지막으로 업로드된 파일을 사용합니다\n제외 인원: {', '.join(remove_p) if remove_p else '없음'}"
+            })
+        else:
+            return jsonify({
+                "response_type":
+                "ephemeral",
+                "text":
+                "최근에 업로드한 파일이 없습니다. `/bobveda` 명령으로 파일 업로드가 필요합니다."
+            })
+    else:
+        threading.Thread(target=remind_file, args=(user_id, ),
+                         daemon=True).start()
+        return jsonify({
+            "response_type":
+            "in_channel",
+            "text":
+            f"밥의 한계를 베다! {user_name}님이 요청한 조편성 시작\n"
+            f"제외 인원: {', '.join(remove_p) if remove_p else '없음'}\n"
+            f"멤버 목록 파일을 업로드해주세요."
+        })
 
     
 @app.route("/slack/events", methods=["POST"])
@@ -194,7 +233,7 @@ def run_c_program(user_id):
             client.chat_postMessage(channel=channel_id,
                                     text=f"밥배정 완료!\n```{result_content}```")
 
-            save_group_history(user_id, result_content)
+            save_history(user_id, result_content)
         else:
             client.chat_postMessage(channel=channel_id, text="파일을 찾을 수 없습니다.")
 
@@ -204,7 +243,7 @@ def run_c_program(user_id):
 
 
 # 결과 저장
-def save_group_history(user_id, group_result):
+def save_history(user_id, group_result):
     history_file = 'group_history.json'
     if os.path.exists(history_file):
         # 안깨지게
