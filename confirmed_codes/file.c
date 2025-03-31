@@ -1,12 +1,11 @@
 #define _CRT_SECURE_NO_WARNINGS
 #include <stdio.h>
 #include <string.h>
-#include <stdlib.h>//check if it's unnecessary
+#include <stdlib.h> 
 
-#include "ong_file.h"
-#include "ong_struct.h"
-
-// gcc makegroup.c -o group_maker 이거로 실행파일 만들 수 있음
+#include "file.h"
+#include "struct.h"
+ 
 void ReadOrigin(MEMBER* members, const char* file_name) {
     FILE* file = fopen(file_name, "r");
     if (!file) {
@@ -22,9 +21,9 @@ void ReadOrigin(MEMBER* members, const char* file_name) {
         char* token = strtok(line, " \n");
 
         if (token == NULL) continue;
-        prev_team = atoi(token); // 첫번째 숫자=팀
+        prev_team = atoi(token);  
 
-        // 한 줄 씩 읽어옴
+
         while ((token = strtok(NULL, " \n")) != NULL) {
             strncpy(name, token, sizeof(name));
             token = strtok(NULL, " \n");
@@ -40,14 +39,14 @@ void ReadOrigin(MEMBER* members, const char* file_name) {
     fclose(file);
 }
 
-// 출력 함수
+
 void printOrigin(MEMBER* members, int count) {
     for (int idx = 0; idx < count; idx++) {
         printf("%d: %s %d %c\n", idx + 1, members[idx].name, members[idx].prev_team, members[idx].gender);
     }
 }
 
-// 남성과 여성 배열을 출력하는 함수
+
 void PrintMembers(MEMBER* Male, MEMBER* Female, MEMBER* Temp, int Mcount, int Fcount, int Tcount) {
     printf("남성 멤버:\n");
     for (int i = 0; i < Mcount; i++) {
@@ -68,32 +67,32 @@ void WriteText(TEAM* teams, MEMBER* Temp, int ab_num, int team_count, const char
     if (!file) {
         perror("파일을 저장할 수 없습니다.");
         exit(1);
-    }
-    //결석자 출력(0조)
+    } 
+
     if (ab_num > 0) {
-        fprintf(file, "%d ", 0); // 팀 번호 출력
+        fprintf(file, "%d ", 0);  
         for (int i = 0; i < ab_num; i++) {
             fprintf(file, "%s %c ", Temp[i].name, Temp[i].gender);
         }
-        fprintf(file, "\n"); // 각 팀의 멤버 출력 후 줄바꿈
+        fprintf(file, "\n");  
     }
 
-    //조편성 출력
+     
     for (int i = 0; i < team_count; i++) {
-        fprintf(file, "%d ", i + 1); // 팀 번호 출력
+        fprintf(file, "%d ", i + 1);  
         for (int j = 0; j < teams[i].count; j++) {
             fprintf(file, "%s %c ", teams[i].member[j].name, teams[i].member[j].gender);
         }
-        fprintf(file, "\n"); // 각 팀의 멤버 출력 후 줄바꿈
+        fprintf(file, "\n"); 
     }
     fclose(file);
 
-    // 콘솔 출력
+    
     for (int i = 0; i < team_count; i++) {
-        printf("%d ", i + 1); // 팀 번호 출력
+        printf("%d ", i + 1);  
         for (int j = 0; j < teams[i].count; j++) {
             printf("%s %c ", teams[i].member[j].name, teams[i].member[j].gender);
         }
-        printf("\n"); // 각 팀의 멤버 출력 후 줄바꿈
+        printf("\n");  
     }
 }

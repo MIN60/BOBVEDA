@@ -1,4 +1,3 @@
-//clean code by ONG
 #define _CRT_SECURE_NO_WARNINGS
 
 #include <stdio.h>
@@ -6,10 +5,10 @@
 #include <time.h>
 #include <stdlib.h>
 
-#include "ong_randomize.h"
-#include "ong_struct.h"
-#include "ong_file.h"
-#include "ong_absent.h"
+#include "randomize.h"
+#include "struct.h"
+#include "file.h"
+#include "absent.h"
 
 int main(int argc, char* argv[]) {
     if (argc < 4)
@@ -22,9 +21,9 @@ int main(int argc, char* argv[]) {
     const char* exclude_list = argv[2];
     const char* output_file = argv[3];
 
-    MEMBER member[30]; // 전체 멤버
-    MEMBER absent[256]; // 제외된 멤버
-    MEMBER Male[30], Female[30], Temp[30]; // 성별 분류
+    MEMBER member[30];  
+    MEMBER absent[256];  
+    MEMBER Male[30], Female[30], Temp[30];  
     int Mcount, Fcount, Tcount;
  
     ReadOrigin(member, input_file);

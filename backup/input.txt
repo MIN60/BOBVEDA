@@ -1,8 +1,0 @@
-0
-1 Alice f Uma f Ivy f David m Tom m
-2 Grace f Mia f Diana f Oscar m Jack m
-3 Pam f Kelly f Catherine f Leo m
-4 Vera f Xena f Frank m Yuri m
-5 Nina f Sophie f Chris m Will m
-6 Bella f Eva f Bob m Quinn m
-7 Ray f Zara f Aaron m Henry m

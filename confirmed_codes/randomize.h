@@ -1,10 +1,10 @@
-#ifndef _ONG_RANDOMIZE_H_
-#define _ONG_RANDOMIZE_H_
+#ifndef _RANDOMIZE_H_
+#define _RANDOMIZE_H_
 
 #include <time.h>
 #include <stdlib.h>
  
-#include "ong_struct.h"
+#include "struct.h"
 
 void InitRandom();
 int RandomNumber(int num);
