@@ -127,7 +127,16 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="absent.c" />
+    <ClCompile Include="file.c" />
+    <ClCompile Include="main.c" />
     <ClCompile Include="randomize.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="absent.h" />
+    <ClInclude Include="file.h" />
+    <ClInclude Include="randomize.h" />
+    <ClInclude Include="struct.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
