@@ -4,9 +4,9 @@ import time
 import threading
 import os
 import requests
+import subprocess
 from slack_sdk import WebClient
 from slack_sdk.errors import SlackApiError
-from slack_sdk import WebClient
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -28,10 +28,6 @@ RESULT_FOLDER = './results'
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 os.makedirs(RESULT_FOLDER, exist_ok=True)
 
-
-@app.route("/", methods=["GET"])
-def index():
-    return "bobveda 서버 실행"
 
 #슬랙 명령어 파싱
 def parse_command(text):
@@ -153,7 +149,7 @@ def process_file(user_id, file_id):
         client.chat_postMessage(channel=channel_id,
             text="조금만 기다려 주세요")
 
-        #C 프로그램 돌리기
+        run_c_program(user_id)
 
     except SlackApiError as e:
         print(f"Slack API 오류: {e}")
@@ -163,6 +159,48 @@ def process_file(user_id, file_id):
         print(f"예외 발생: {e}")
         client.chat_postMessage(channel=user_commands[user_id]['channel_id'],
             text=f"오류 {str(e)}")
+
+
+def run_c_program(user_id):
+    command_info = user_commands[user_id]
+    input_file = command_info['file_path']
+    output_file = os.path.join(RESULT_FOLDER, f"result_{user_id}.txt")
+    exclude_list = ','.join(
+        command_info['remove_p']) if command_info['remove_p'] else ""
+    channel_id = command_info['channel_id']
+
+    try:
+        print(f"제외자 목록 (C로 전달됨): '{exclude_list}'")
+        cmd = ["./group_maker", input_file, exclude_list, output_file]
+        print(f"실행할 명령어: {cmd}")
+
+        result = subprocess.run(cmd, capture_output=True, text=True)
+
+        if result.returncode != 0:
+            client.chat_postMessage(channel=channel_id,
+                                    text=f"C 프로그램 오류\n```{result.stderr}```")
+            return
+
+        if os.path.exists(output_file):
+            with open(output_file, 'r', encoding='utf-8') as f:
+                result_content = f.read()
+
+            client.chat_postMessage(channel=channel_id,
+                                    text=f"밥배정 완료!\n```{result_content}```")
+
+            # 결과 저장 추가하기기
+        else:
+            client.chat_postMessage(channel=channel_id, text="파일을 찾을 수 없습니다.")
+
+    except Exception as e:
+        client.chat_postMessage(channel=channel_id, text=f"오류 발생: {str(e)}")
+        print(f"오류: {e}")
+
+
+
+@app.route("/", methods=["GET"])
+def index():
+    return "bobveda 서버 실행"
 
 
 if __name__ == "__main__":
