@@ -188,13 +188,36 @@ def run_c_program(user_id):
             client.chat_postMessage(channel=channel_id,
                                     text=f"밥배정 완료!\n```{result_content}```")
 
-            # 결과 저장 추가하기기
+            save_group_history(user_id, result_content)
         else:
             client.chat_postMessage(channel=channel_id, text="파일을 찾을 수 없습니다.")
 
     except Exception as e:
         client.chat_postMessage(channel=channel_id, text=f"오류 발생: {str(e)}")
         print(f"오류: {e}")
+
+
+# 결과 저장
+def save_group_history(user_id, group_result):
+    history_file = 'group_history.json'
+    if os.path.exists(history_file):
+        # 안깨지게
+        with open(history_file, 'r', encoding='utf-8') as f:
+            try:
+                history = json.load(f)
+            except json.JSONDecodeError:
+                history = {}
+    else:
+        history = {}
+
+    timestamp = time.strftime('%Y-%m-%d %H:%M:%S')
+    history.setdefault(user_id, []).append({
+        'timestamp': timestamp,
+        'result': group_result
+    })
+
+    with open(history_file, 'w', encoding='utf-8') as f:
+        json.dump(history, f, ensure_ascii=False, indent=2)
 
 
 
