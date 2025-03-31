@@ -21,8 +21,8 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{8e3f7242-8bef-4507-97b1-d38ff162cc2b}</ProjectGuid>
-    <RootNamespace>aaa</RootNamespace>
+    <ProjectGuid>{a6ce661c-2267-4ae6-ab4e-0cbb57d80b69}</ProjectGuid>
+    <RootNamespace>bobveda</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -127,7 +127,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="im_c.c" />
+    <ClCompile Include="randomize.c" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
