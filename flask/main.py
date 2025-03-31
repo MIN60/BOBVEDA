@@ -42,14 +42,14 @@ def parse_command(text):
 
     return remove_p
 
-# 파일 업로드 리마인드 (30초 뒤에도 안 올리면 알림림)
+# 파일 업로드 리마인드 (30초 뒤에도 안 올리면 알림)
 def remind_file(user_id):
     time.sleep(20)
     if user_id in user_commands and user_commands[user_id].get("waiting_for_file", False):
         try:
             client.chat_postMessage(
                 channel=user_commands[user_id]['channel_id'],
-                text="'이름 성별'로 이루어진 txt파일을 기다리고 있습니다...\n예시:\n김도현 M\n남윤서 F"
+                text="'지난조 이름 성별'로 이루어진 txt파일을 기다리고 있습니다...\n예시:\n김도현 M\n남윤서 F"
             )
             print(f"!!!리마인드 메시지 전송 완료 {user_id}")
         except SlackApiError as e:
@@ -59,36 +59,49 @@ def remind_file(user_id):
 @app.route("/slack/bobveda", methods=["POST"])
 def handle_bobveda():
     user_id = request.form.get("user_id")
-    user_name = request.form.get("user_name")
     text = request.form.get("text")
     channel_id = request.form.get("channel_id")
 
-    print(f"밥베다 호출\n 사용자: {user_name} 명령어 내용: {text}")
+    # 기본 사용자 이름 설정
+    user_name = "USER"
 
-    div_group, remove_p = parse_command(text)
-    
-    # 예외처리
-    if div_group is None:
+    # user_id가 없으면 바로 에러 응답
+    if not user_id:
         return jsonify({
             "response_type": "ephemeral",
-            "text": "올바른 형식으로 입력해주세요. 예: '/bobveda 4 -김민정, 옹미령, 장동철'"
+            "text": "사용자 ID를 확인할 수 없습니다."
         })
+
+    # 닉네임 불러오기 시도
+    try:
+        user_info = client.users_info(user=user_id)
+        user_name = (user_info['user']['profile'].get('display_name')
+                     or user_info['user'].get('real_name') or "사용자")
+    except Exception as e:
+        print(f"닉네임 가져오기 실패: {e}")
+        user_name = "사용자"
+
+    print(f"밥베다 호출됨 → 사용자: {user_name}, 내용: {text}")
+
+    remove_p = parse_command(text)
 
     user_commands[user_id] = {
         'timestamp': time.time(),
         'channel_id': channel_id,
-        'div_group': div_group,
         'remove_p': remove_p,
         'waiting_for_file': True
     }
 
-    # 리마인드 스레드 실행
-    threading.Thread(target=remind_file, args=(user_id,), daemon=True).start()
+    # 파일 업로드 리마인드용 쓰레드 실행
+    threading.Thread(target=remind_file, args=(user_id, ), daemon=True).start()
 
     return jsonify({
-        "response_type": "in_channel",
-        "text": f"밥의 한계를 베다! {user_name}님이 요청한 `{div_group}명 랜밥` 시작!\n 제외 인원: {', '.join(remove_p) if remove_p else '없음'}\n 이제 멤버 목록 파일을 업로드해주세요."
+        "response_type":
+        "in_channel",
+        "text":
+        f"밥의 한계를 베다! {user_name}님이 요청한 랜밥이 시작됩니다!\n제외 인원: {', '.join(remove_p) if remove_p else '없음'}\n멤버 목록 파일을 업로드해주세요."
     })
+
     
 @app.route("/slack/events", methods=["POST"])
 def slack_events():
