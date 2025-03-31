@@ -107,7 +107,7 @@ def handle_bobveda():
 def slack_events():
     data = request.get_json() #slack 데이터 파싱
 
-    # 슬랫 통신 응답
+    # 슬랙 통신 응답
     if "challenge" in data:
         return jsonify({"challenge": data["challenge"]})
 
@@ -230,6 +230,10 @@ def save_group_history(user_id, group_result):
 @app.route("/", methods=["GET"])
 def index():
     return "bobveda 서버 실행"
+
+@app.route("/ping", methods=["GET"])
+def ping():
+    return "pong", 200
 
 
 if __name__ == "__main__":
