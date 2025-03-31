@@ -84,13 +84,8 @@ def handle_bobveda():
 
     print(f"밥베다 호출됨 → 사용자: {user_name}, 내용: {text}")
 
-    if not text:
-        return jsonify({
-            "response_type":
-            "ephemeral",
-            "text":
-            "명령어 내용이 비었습니다. `/bobveda 4 -제외할 사람` 또는 `/bobveda last -제외할 사람` 형식으로 입력하세요"
-        })
+    if text is None:
+        text = ""
 
     is_last = text.strip().lower().startswith("last")
     exclude_text = text.strip()[4:] if is_last else text
