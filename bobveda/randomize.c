@@ -3,101 +3,10 @@
 #include <string.h>
 #include <time.h>
 #include <stdlib.h>
+#include "struct.h"
+#include "randomize.h"
+
 //gcc makegroup.c -o group_maker 이거로 실행파일 만들 수 있음
-
-typedef struct MEMBER MEMBER;
-typedef struct TEAM TEAM;
-
-void ReadOrigin(MEMBER* members, const char* file_name);
-void printOrigin(MEMBER* members, int count);
-void PrintMembers(MEMBER* Male, MEMBER* Female, MEMBER* Temp, int Mcount, int Fcount, int Tcount);
-void WriteText(TEAM* teams, MEMBER* Temp, int ab_num, int team_count, const char* file_name);
-
-void InitRandom();
-int RandomNumber(int num);
-
-int Absent(MEMBER* member, char* ab_name);
-void Classification(MEMBER* Tptr, MEMBER* Mptr, MEMBER* Fptr, MEMBER* temp, const int size, int* FCount, int* MCount, int* TCount);
-int* CreateNumArr(int num);
-int TeamSelect(TEAM* Team, MEMBER* Male, MEMBER* Female, int Mcount, int Fcount);
-int DuplCheck(int n, int* arr);
-void ArrUpdate(int** arr, int* size, int index);
-void Genderchange(MEMBER* Temp, int size);
-
-
-struct MEMBER {
-    char name[20];
-    int prev_team; // 직전 조가 없었던 경우 -1로 초기화
-    char gender; // f:female, m:male
-};
-
-struct TEAM {
-    MEMBER* member; //member 추가할 배열
-    int set[5]; //중복 checking할 배열 -1로 초기화
-    int count; //멤버 수, TeamSelect함수 내에서 0으로 초기화
-};
-
-
-int main(int argc, char* argv[]) {
-    if (argc < 4) {
-        printf("누락: ./group_maker input.txt excludeList output.txt\n");
-        return 1;
-    }
-
-    const char* input_file = argv[1];
-    const char* exclude_list = argv[2];
-    const char* output_file = argv[3];
-
-    MEMBER member[30]; // 전체 멤버
-    MEMBER absent[256]; // 제외된 멤버
-    MEMBER Male[30], Female[30], Temp[30]; // 성별 분류
-    int Mcount, Fcount, Tcount;
-
-    // 입력 파일 읽기
-    ReadOrigin(member, input_file);
-
-    // 제외자 처리
-    char ab_copy[256];
-    strncpy(ab_copy, exclude_list, sizeof(ab_copy));
-    ab_copy[sizeof(ab_copy) - 1] = '\0';
-    int ab_num = Absent(member, ab_copy);
-
-    // 성별 분류
-    Classification(member, Male, Female, Temp, 30, &Fcount, &Mcount, &Tcount);
-    // 성별 분류 확인
-    PrintMembers(Male, Female, Temp, Fcount, Mcount, Tcount);
-    printf("ab_num: %d", Tcount);
-    // 결석자 성별 변환
-    Genderchange(Temp, ab_num);
-
-    // 팀 생성
-    TEAM teams[7];
-    for (int i = 0; i < 7; i++) {
-        teams[i].member = (MEMBER*)malloc(sizeof(MEMBER) * 5);
-        if (!teams[i].member) {
-            perror("Memory allocation failed");
-            exit(1);
-        }
-        for (int j = 0; j < 5; j++) {
-            teams[i].set[j] = -1;
-        }
-    }
-    // 팀 배정
-    InitRandom();
-    TeamSelect(teams, Male, Female, Mcount, Fcount);
-
-
-    // 결과 파일 저장
-    //WriteText(teams, Temp, ab_num, 7, output_file);
-    WriteText(teams, Temp, Tcount, 7, output_file);  // ab_num → Tcount
-
-    // 메모리 해제
-    for (int i = 0; i < 7; i++) {
-        free(teams[i].member);
-    }
-
-    return 0;
-}
 
 //각 팀에 이전팀과 성비를 감안하여 조를 짜는 함수
 // TeamSelect 함수 수정
@@ -265,83 +174,6 @@ void Classification(MEMBER* Tptr, MEMBER* Mptr, MEMBER* Fptr, MEMBER* temp, cons
 }
 
 
-void ReadOrigin(MEMBER* members, const char* file_name) {
-    FILE* file = fopen(file_name, "r");
-    if (!file) {
-        perror("파일을 열 수 없습니다.");
-        exit(1);
-    }
-
-    int idx = 0;
-    char line[256];
-    while (fgets(line, sizeof(line), file)) {
-        int prev_team;
-        char name[20], gender;
-        char* token = strtok(line, " \n");
-
-        if (token == NULL) continue;
-        prev_team = atoi(token); // 첫번째 숫자=팀
-
-        // 한 줄 씩 읽어옴
-        while ((token = strtok(NULL, " \n")) != NULL) {
-            strncpy(name, token, sizeof(name));
-            token = strtok(NULL, " \n");
-            if (token == NULL) break;
-            gender = token[0];
-
-            strncpy(members[idx].name, name, sizeof(members[idx].name));
-            members[idx].gender = gender;
-            members[idx].prev_team = prev_team;
-            idx++;
-        }
-    }
-    fclose(file);
-}
-
-
-
-// 출력 함수
-void printOrigin(MEMBER* members, int count) {
-    for (int idx = 0; idx < count; idx++) {
-        printf("%d: %s %d %c\n", idx + 1, members[idx].name, members[idx].prev_team, members[idx].gender);
-    }
-}
-
-void WriteText(TEAM* teams, MEMBER* Temp, int ab_num, int team_count, const char* file_name) {
-    FILE* file = fopen(file_name, "w");
-    if (!file) {
-        perror("파일을 저장할 수 없습니다.");
-        exit(1);
-    }
-    //결석자 출력(0조)
-    if (ab_num > 0) {
-        fprintf(file, "%d ", 0); // 팀 번호 출력
-        for (int i = 0; i < ab_num; i++) {
-            fprintf(file, "%s %c ", Temp[i].name, Temp[i].gender);
-        }
-        fprintf(file, "\n"); // 각 팀의 멤버 출력 후 줄바꿈
-    }
-
-    //조편성 출력
-    for (int i = 0; i < team_count; i++) {
-        fprintf(file, "%d ", i + 1); // 팀 번호 출력
-        for (int j = 0; j < teams[i].count; j++) {
-            fprintf(file, "%s %c ", teams[i].member[j].name, teams[i].member[j].gender);
-        }
-        fprintf(file, "\n"); // 각 팀의 멤버 출력 후 줄바꿈
-    }
-    fclose(file);
-
-    // 콘솔 출력
-    for (int i = 0; i < team_count; i++) {
-        printf("%d ", i + 1); // 팀 번호 출력
-        for (int j = 0; j < teams[i].count; j++) {
-            printf("%s %c ", teams[i].member[j].name, teams[i].member[j].gender);
-        }
-        printf("\n"); // 각 팀의 멤버 출력 후 줄바꿈
-    }
-}
-
 void ArrUpdate(int** arr, int* size, int index) {
     if (*size <= 0 || index >= *size) return;
     // 선택된 인덱스의 값과 마지막 값을 교환
@@ -366,37 +198,9 @@ void ArrUpdate(int** arr, int* size, int index) {
     }
 }
 
-void Genderchange(MEMBER* Temp, int size)
-{
-    // 결석자 이름을 찾고 성별 수정
-    for (int i = 0; i < size; i++) {
-        if (Temp[i].gender == 'N')
-            Temp[i].gender = 'M';
-        else if (Temp[i].gender == 'E')
-            Temp[i].gender = 'F';
-    }
-}
 
-int Absent(MEMBER* member, char* ab_name)
-{
-    int absent_num = 0;
-    char* name = strtok(ab_name, ",");
-    while (name != NULL) {
-        absent_num++;  // 결석자 수 증가
-        // 결석자 이름을 찾고 성별 수정
-        for (int i = 0; i < 30; i++) { //전체 인원 돌리면서 해당 인원 추출
-            if (strcmp(name, member[i].name) == 0) {
-                if (member[i].gender == 'M')
-                    member[i].gender = 'N';// 결석할 남자 -> N으로 변경
-                else if (member[i].gender == 'F')
-                    member[i].gender = 'E';  // 결석할 여자 -> E로 변경
 
-            }
-        }
-        name = strtok(NULL, ",");
-    }
-    return absent_num;
-}
+
 
 // 남성과 여성 배열을 출력하는 함수
 void PrintMembers(MEMBER* Male, MEMBER* Female, MEMBER* Temp, int Mcount, int Fcount, int Tcount) {
