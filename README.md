@@ -95,6 +95,10 @@ BOBVEDA는 슬랙봇을 이용하여 식사 그룹을 간편하게 매칭하는 
 - slack 내에서 파일 관리 명령어 추가
 - 인원수 제한 없도록 업데이트
 
+## 참고자료
+https://api.slack.com/authentication <br/>
+https://flask-docs-kr.readthedocs.io/ko/latest/
+
 ## 팀 소개
 자주 자습하는 사람들
 
