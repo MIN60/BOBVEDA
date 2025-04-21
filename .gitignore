@@ -1,6 +1,7 @@
 .vs/
 *.user
 *.suo
+bobveda/*.txt
 bobveda/bobveda.vcxproj
 bobveda/bobveda.vcxproj.filters
 bobveda.vcxproj

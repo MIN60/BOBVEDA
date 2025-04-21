@@ -4,7 +4,7 @@
 #include <time.h>
 #include <stdlib.h>
 
-#include "file.c"
+#include "file.h"
 #include "struct.h"
 
 
